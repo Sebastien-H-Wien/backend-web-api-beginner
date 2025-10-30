@@ -1,18 +1,22 @@
 using BackendAPI.User.Data;
 using NSwag;
 using NSwag.Generation.Processors.Security;
-
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true);
+}
 
 
 builder.AddApplicationServices();
 
-var conString =  builder.Configuration["ApplicationDbContext"] ??
-     throw new InvalidOperationException("Connection string 'ApplicationDbContext' not found.");
+var conString = "Host=webapp-postgres-2;Username=user;Password=user_pwd;Port=5432;Database=user";
+/* var conString =  builder.Configuration["ApplicationDbContext"] ??
+     throw new InvalidOperationException("Connection string 'ApplicationDbContext' not found."); */
 
 await using var conn = new NpgsqlConnection(conString);
 await using var dataSource = NpgsqlDataSource.Create(conString);
