@@ -16,6 +16,8 @@ services:
     ports:
         - "5195:5195"
         - "7062:5195"
+    volumes:
+      - .:/app:rw
     environment:
         - DEVELOPMENT=true
         - ASPNETCORE_ENVIRONMENT=Development

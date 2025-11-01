@@ -1,6 +1,6 @@
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0@sha256:3fcf6f1e809c0553f9feb222369f58749af314af6f063f389cbd2f913b4ad556 AS build
-WORKDIR /App
+FROM mcr.microsoft.com/dotnet/sdk:9.0@sha256:3fcf6f1e809c0553f9feb222369f58749af314af6f063f389cbd2f913b4ad556 AS image-dotnet-sdk
+WORKDIR /app
 
 # Copy everything
 COPY ["BackendWebAPIBeginner.csproj", "./"]
@@ -9,19 +9,19 @@ RUN dotnet restore "BackendWebAPIBeginner.csproj"
 
 # Build
 COPY [".", "./"]
-RUN dotnet build "BackendWebAPIBeginner.csproj" -c Release -o /App/build
+RUN dotnet build "BackendWebAPIBeginner.csproj" -c Release -o /app/build
 
 
 #Publish
-FROM build AS publish
-RUN dotnet publish "BackendWebAPIBeginner.csproj" -c Release -o /App/publish
+FROM image-dotnet-sdk AS publish
+RUN dotnet publish "BackendWebAPIBeginner.csproj" -c Release -o /app/publish
 
 # Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:9.0@sha256:b4bea3a52a0a77317fa93c5bbdb076623f81e3e2f201078d89914da71318b5d8
+FROM mcr.microsoft.com/dotnet/aspnet:9.0@sha256:b4bea3a52a0a77317fa93c5bbdb076623f81e3e2f201078d89914da71318b5d8 AS image-dotnet-aspnet
 ENV ASPNETCORE_HTTP_PORTS=5195
 EXPOSE 5195
-WORKDIR /App
-COPY --from=publish /App/publish .
+WORKDIR /app
+COPY --from=publish /app/publish .
 # ENTRYPOINT ["dotnet", "DotNet.Docker.dll"]
 ENTRYPOINT ["dotnet", "BackendWebAPIBeginner.dll"]
 
